@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Mappings:
+  RegionEC2InstanceImageMap:
+    us-east-2:
+      HVM64: ami-02de934ca4f3289e0 
+      HVM32: ami-0233c2d874b811deb
+    ap-southeast-1:
+      HVM64: ami-0390917f7df0de28c
+      HVM32: ami-0e5182fad1edfaa68
+    ap-southeast-2:
+      HVM64: ami-0646b10ec20a40c81
+      HVM64arm: ami-0fdc3e6b9ead9b8c3
+
+Parameters:
+  EC2InstanceType:
+    Description: The Instance Type Chosen for EC2
+    Type: String
+    
+Resources:
+  PaulTestInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: ap-southeast-2a
+      ImageId: !FindInMap
+        - RegionEC2InstanceImageMap
+        - !Ref 'AWS::Region'
+        - HVM64
+      InstanceType: !Ref EC2InstanceType
+      SecurityGroups:
+        - !Ref HTTPSecurityGroup
+
+  HTTPSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable port 80 and port 443
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        FromPort: 80
+        IpProtocol: tcp
+        ToPort: 80
+      - CidrIp: 0.0.0.0/0
+        FromPort: 443
+        IpProtocol: tcp
+        ToPort: 443
